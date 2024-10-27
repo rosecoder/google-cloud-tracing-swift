@@ -1,5 +1,5 @@
 {
-  "originHash" : "acd031c7176f69df3a0dff50e5c99e8b361eb99c9f5c540bf18329cc7e73c4ba",
+  "originHash" : "ed318fd649dbdd6b01df82b660f6544774c9cc122be264e5dc1fb89538d5e2b3",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -17,6 +17,14 @@
       "state" : {
         "revision" : "3bb5bdbf368719f2fe53d78b9042b54b0576d3dc",
         "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "google-cloud-service-context",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/rosecoder/google-cloud-service-context.git",
+      "state" : {
+        "revision" : "5464a8beb9b4d4d93cc219313b207bd82cc128bb"
       }
     },
     {
