@@ -64,8 +64,8 @@ extension GoogleCloudTracer {
         guard let projectID = context.projectID else {
             throw WriteError.missingProjectID
         }
-        let encodedSpans = spans.compactMap { 
-            encode(span: $0, projectID: projectID, context: context) 
+        let encodedSpans = spans.compactMap {
+            encode(span: $0, projectID: projectID)
         }
         guard !encodedSpans.isEmpty else {
             return
@@ -78,7 +78,7 @@ extension GoogleCloudTracer {
         ]))
     }
 
-    private func encode(span: Span, projectID: String, context: ServiceContext) -> Google_Devtools_Cloudtrace_V2_Span? {
+    private func encode(span: Span, projectID: String) -> Google_Devtools_Cloudtrace_V2_Span? {
         let spanIDString = span.id.stringValue
         guard let trace = span.context.trace else {
             return nil
@@ -95,7 +95,7 @@ extension GoogleCloudTracer {
             $0.displayName = Google_Devtools_Cloudtrace_V2_TruncatableString(span.operationName, limit: 128)
             $0.startTime = .init(nanosecondsSinceEpoch: span.startTimeNanosecondsSinceEpoch)
             $0.endTime = .init(nanosecondsSinceEpoch: endTimeNanosecondsSinceEpoch)
-            $0.attributes = encode(attributes: span.attributes, context: context)
+            $0.attributes = encode(attributes: span.attributes, context: span.context)
             if let status = span.status {
                 $0.status = .with {
                     switch status.code {
@@ -110,7 +110,7 @@ extension GoogleCloudTracer {
 //            $0.sameProcessAsParentSpan
 //            $0.links
             $0.timeEvents = .with {
-                $0.timeEvent = span.events.map { encode(event: $0, context: context) }
+                $0.timeEvent = span.events.map { encode(event: $0, context: span.context) }
             }
 //            $0.stackTrace
 //            $0.childSpanCount
@@ -133,7 +133,6 @@ extension GoogleCloudTracer {
         let limit: UInt8 = 32
 
         var encoded = Google_Devtools_Cloudtrace_V2_Span.Attributes.with {
-            $0.attributeMap = [:]
             $0.droppedAttributesCount = 0
         }
         var count: UInt8 = 0
