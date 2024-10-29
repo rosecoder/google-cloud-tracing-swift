@@ -87,6 +87,8 @@ public final class Span: Tracing.Span {
             attributes: eventAttributes
         )
         addEvent(event)
+
+        _status.withLock { $0 = .init(code: .error, message: String(describing: error)) }
     }
 
     public func end<Instant>(at instant: @autoclosure () -> Instant) where Instant : TracerInstant {
