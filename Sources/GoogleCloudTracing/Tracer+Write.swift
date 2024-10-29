@@ -119,15 +119,12 @@ extension GoogleCloudTracer {
     }
 
     private func encode(attributes: SpanAttributes, context: ServiceContext) -> Google_Devtools_Cloudtrace_V2_Span.Attributes {
-
-        // Well-known labels can be found here: https://github.com/googleapis/cloud-trace-nodejs/blob/c57a0b100d00fe0002544400c3958a17cc9751fb/src/trace-labels.ts
-
         var attributes = attributes
         if let serviceName = context.serviceName {
-            attributes["g.co/gae/app/module"] = serviceName
+            attributes["service.name"] = serviceName
         }
         if let version = context.serviceVersion {
-            attributes["g.co/gae/app/version"] = version
+            attributes["service.version"] = version
         }
 
         let limit: UInt8 = 32
