@@ -100,9 +100,9 @@ extension GoogleCloudTracer {
                 $0.status = .with {
                     switch status.code {
                     case .ok:
-                        $0.code = 200
+                        $0.code = Int32(GRPCStatus.Code.ok.rawValue)
                     case .error:
-                        $0.code = 500
+                        $0.code = Int32(GRPCStatus.Code.internalError.rawValue)
                     }
                     $0.message = status.message ?? ""
                 }
