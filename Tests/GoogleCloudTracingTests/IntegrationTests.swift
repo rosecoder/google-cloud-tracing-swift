@@ -15,6 +15,8 @@ import Foundation
 
         do {
             try await withSpan("root-span") { span in
+                span.attributes["test-attribute"] = "test-value"
+
                 try await withThrowingTaskGroup(of: Void.self) { group in
                     for number in 1...3 {
                         group.addTask {
