@@ -5,12 +5,13 @@ import GoogleCloudServiceContext
 import NIO
 import Foundation
 
-@Suite struct IntegrationTests {
+import Logging
 
-    let tracer = GoogleCloudTracer(eventLoopGroup: MultiThreadedEventLoopGroup(numberOfThreads: 1))
+@Suite struct IntegrationTests {
 
     @Test(.enabled(if: ProcessInfo.processInfo.environment["GOOGLE_APPLICATION_CREDENTIALS"] != nil))
     func createSpan() async throws {
+        let tracer = try await GoogleCloudTracer(eventLoopGroup: MultiThreadedEventLoopGroup(numberOfThreads: 1))
         InstrumentationSystem.bootstrap(tracer)
 
         var context = ServiceContext.current ?? .topLevel
@@ -47,6 +48,8 @@ import Foundation
 
         let lastWriteTask = tracer.lastWriteTask.withLock { $0 }
         try await lastWriteTask?.value
+
+        try await tracer.shutdown()
 
         // Manual validation
     }

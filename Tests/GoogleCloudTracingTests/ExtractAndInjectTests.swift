@@ -6,8 +6,12 @@ import NIO
 
 @Suite struct ExtractAndInjectTests {
 
-    let tracer = GoogleCloudTracer(eventLoopGroup: MultiThreadedEventLoopGroup(numberOfThreads: 1))
-    
+    let tracer: GoogleCloudTracer
+
+    init() async throws {
+        tracer = try await GoogleCloudTracer(eventLoopGroup: MultiThreadedEventLoopGroup(numberOfThreads: 1))
+    }
+
     @Test func extractValidTraceContext() {
         var context = ServiceContext.topLevel
         let carrier = ["X-Cloud-Trace-Context": "105445aa7843bc8bf206b12000100000/1;o=1"]

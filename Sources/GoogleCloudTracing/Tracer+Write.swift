@@ -2,7 +2,7 @@ import ServiceContextModule
 import Instrumentation
 import GoogleCloudServiceContext
 import RetryableTask
-import GRPC
+import GRPCCore
 import Tracing
 import Foundation
 
@@ -73,9 +73,9 @@ extension GoogleCloudTracer {
         _ = try await client.batchWriteSpans(.with {
             $0.name = "projects/" + projectID
             $0.spans = encodedSpans
-        }, callOptions: CallOptions(customMetadata: [
-            "authorization": "Bearer " + authorization.accessToken(),
-        ]))
+        }, metadata: [
+            "authorization": .string("Bearer " + authorization.accessToken()),
+        ])
     }
 
     private func encode(span: Span, projectID: String) -> Google_Devtools_Cloudtrace_V2_Span? {
@@ -100,9 +100,9 @@ extension GoogleCloudTracer {
                 $0.status = .with {
                     switch status.code {
                     case .ok:
-                        $0.code = Int32(GRPCStatus.Code.ok.rawValue)
+                        $0.code = Int32(Status.Code.ok.rawValue)
                     case .error:
-                        $0.code = Int32(GRPCStatus.Code.internalError.rawValue)
+                        $0.code = Int32(Status.Code.internalError.rawValue)
                     }
                     $0.message = status.message ?? ""
                 }

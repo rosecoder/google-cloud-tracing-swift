@@ -2,7 +2,9 @@ import Tracing
 import GoogleCloudServiceContext
 import NIO
 import GoogleCloudAuth
-import GRPC
+import GRPCCore
+import GRPCProtobuf
+import GRPCNIOTransportHTTP2
 import Foundation
 import Synchronization
 import Logging
@@ -14,7 +16,10 @@ public final class GoogleCloudTracer: Tracer {
     let logger = Logger(label: "trace.write")
 
     let authorization: Authorization
-    let client: Google_Devtools_Cloudtrace_V2_TraceServiceAsyncClient
+    let client: Google_Devtools_Cloudtrace_V2_TraceService_Client
+
+    private let grpcClient: GRPCClient
+    private let grpcClientRunTask: Task<Void, Error>
 
     public let writeInterval: TimeInterval?
     public let maximumBatchSize: Int
@@ -28,7 +33,7 @@ public final class GoogleCloudTracer: Tracer {
         writeInterval: TimeInterval? = 10,
         maximumBatchSize: Int = 500,
         eventLoopGroup: EventLoopGroup
-    ) {
+    ) async throws {
         self.writeInterval = writeInterval
         self.maximumBatchSize = maximumBatchSize
 
@@ -37,10 +42,20 @@ public final class GoogleCloudTracer: Tracer {
             "https://www.googleapis.com/auth/cloud-platform",
         ], eventLoopGroup: eventLoopGroup)
 
-        let channel = ClientConnection
-            .usingTLSBackedByNIOSSL(on: eventLoopGroup)
-            .connect(host: "cloudtrace.googleapis.com", port: 443)
-        self.client = Google_Devtools_Cloudtrace_V2_TraceServiceAsyncClient(channel: channel)
+        let transport = try HTTP2ClientTransport.Posix(
+            target: .dns(host: "cloudtrace.googleapis.com", port: 443),
+            config: .defaults(transportSecurity: .tls(.defaults(configure: { config in
+                config.serverHostname = "cloudtrace.googleapis.com"
+            }))),
+            eventLoopGroup: eventLoopGroup
+        )
+        let grpcClient = GRPCClient(transport: transport)
+        self.grpcClient = grpcClient
+        self.grpcClientRunTask = Task.detached {
+            try await grpcClient.run()
+        }
+
+        self.client = Google_Devtools_Cloudtrace_V2_TraceService_Client(wrapping: grpcClient)
 
         scheduleRepeatingWriteTimer()
     }
@@ -53,6 +68,8 @@ public final class GoogleCloudTracer: Tracer {
 
         writeIfNeeded()
         await waitForWrite()
+        grpcClient.beginGracefulShutdown()
+        try await grpcClientRunTask.value
         try await authorization.shutdown()
     }
 
