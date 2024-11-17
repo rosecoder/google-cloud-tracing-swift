@@ -8,8 +8,8 @@ import NIO
 
     let tracer: GoogleCloudTracer
 
-    init() async throws {
-        tracer = try await GoogleCloudTracer(eventLoopGroup: MultiThreadedEventLoopGroup(numberOfThreads: 1))
+    init() throws {
+        tracer = try GoogleCloudTracer()
     }
 
     @Test func extractValidTraceContext() {

@@ -4,55 +4,50 @@ import GoogleCloudServiceContext
 import RetryableTask
 import GRPCCore
 import Tracing
-import Foundation
 
 extension GoogleCloudTracer {
 
     func bufferWrite(span: Span) {
         precondition(span.endTimeNanosecondsSinceEpoch != nil, "Scheduled span has not ended.")
 
-        buffer.withLock { buffer in
+        let needsWrite = buffer.withLock { buffer in
             buffer.append(span)
-            if buffer.count > maximumBatchSize {
-                write(buffer: &buffer)
-            }
+            return buffer.count > maximumBatchSize
         }
-    }
-
-    public func writeIfNeeded() {
-        buffer.withLock { buffer in
-            guard !buffer.isEmpty else {
-                return
-            }
-            write(buffer: &buffer)
-        }
-    }
-
-    public func waitForWrite() async {
-        let task = lastWriteTask.withLock {
-            $0
-        }
-        try? await task?.value // TODO: Not guaranteed to be the last write. But this may be good enough?
-    }
-
-    private func write(buffer: inout [Span]) {
-        let spans = buffer
-        buffer.removeAll(keepingCapacity: true)
-
-        logger.debug("Writing \(spans.count) trace span(s)...")
-
-        let task: Task<(), Error> = Task {
-            do {
-                try await withRetryableTask(logger: logger) {
-                    try await self._write(spans: spans)
+        if needsWrite {
+            lastWriteTask.withLock {
+                $0 = Task {
+                    await writeIfNeeded()
                 }
-                logger.debug("Successfully wrote spans.")
-            } catch {
-                logger.error("Error writing trace spans: \(error)")
-                throw error
             }
         }
-        lastWriteTask.withLock { $0 = task }
+    }
+
+    func writeIfNeeded() async {
+        let task: Task<Void, Never>? = buffer.withLock { buffer in
+            guard !buffer.isEmpty else {
+                return nil
+            }
+            let spans = buffer
+            buffer.removeAll(keepingCapacity: true)
+            return Task(priority: .background) {
+                await write(spans: spans)
+            }
+        }
+        await task?.value
+    }
+
+    private func write(spans: [Span]) async {
+        logger.trace("Writing \(spans.count) trace span(s)...")
+
+        do {
+            try await withRetryableTask(logger: logger) {
+                try await self._write(spans: spans)
+            }
+            logger.debug("Successfully wrote spans.")
+        } catch {
+            logger.error("Error writing trace spans: \(error)")
+        }
     }
 
     enum WriteError: Error {

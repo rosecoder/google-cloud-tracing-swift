@@ -1,17 +1,19 @@
-import Foundation
-
 extension GoogleCloudTracer {
 
-    func scheduleRepeatingWriteTimer() {
+    func startWriteTimerTask() -> Task<Void, Error>? {
         guard let writeInterval else {
-            return
+            return nil
         }
-        writeTimer.withLock {
-            let timer = Timer(timeInterval: writeInterval, repeats: true) { _ in
-                self.writeIfNeeded()
-            }
-            $0 = timer
-            RunLoop.current.add(timer, forMode: .common)
+        return Task(priority: .background) {
+            try await self.startWriteTimer(writeInterval: writeInterval)
+        }
+    }
+
+    private func startWriteTimer(writeInterval: Duration) async throws {
+        while true {
+            try await Task.sleep(for: writeInterval, tolerance: .seconds(1))
+
+            await self.writeIfNeeded()
         }
     }
 }

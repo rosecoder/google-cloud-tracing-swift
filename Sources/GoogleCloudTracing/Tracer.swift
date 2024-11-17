@@ -5,11 +5,11 @@ import GoogleCloudAuth
 import GRPCCore
 import GRPCProtobuf
 import GRPCNIOTransportHTTP2
-import Foundation
 import Synchronization
 import Logging
+import ServiceLifecycle
 
-public final class GoogleCloudTracer: Tracer {
+public final class GoogleCloudTracer: Tracer, Service {
 
     public typealias Span = GoogleCloudTracing.Span
 
@@ -19,62 +19,83 @@ public final class GoogleCloudTracer: Tracer {
     let client: Google_Devtools_Cloudtrace_V2_TraceService_Client
 
     private let grpcClient: GRPCClient
-    private let grpcClientRunTask: Task<Void, Error>
 
-    public let writeInterval: TimeInterval?
+    public let writeInterval: Duration?
     public let maximumBatchSize: Int
 
-    let writeTimer = Mutex<Timer?>(nil)
-
-    let lastWriteTask: Mutex<Task<(), Error>?> = Mutex(nil)
+    let lastWriteTask: Mutex<Task<Void, Never>?> = Mutex(nil)
     let buffer = Mutex<[Span]>([]) // TODO: Should we reserve capacity from `maximumBatchSize`?
 
     public init(
-        writeInterval: TimeInterval? = 10,
-        maximumBatchSize: Int = 500,
-        eventLoopGroup: EventLoopGroup
-    ) async throws {
+        writeInterval: Duration? = .seconds(10),
+        maximumBatchSize: Int = 500
+    ) throws {
         self.writeInterval = writeInterval
         self.maximumBatchSize = maximumBatchSize
 
         self.authorization = Authorization(scopes: [
             "https://www.googleapis.com/auth/trace.append",
             "https://www.googleapis.com/auth/cloud-platform",
-        ], eventLoopGroup: eventLoopGroup)
+        ], eventLoopGroup: .singletonMultiThreadedEventLoopGroup)
 
         let transport = try HTTP2ClientTransport.Posix(
             target: .dns(host: "cloudtrace.googleapis.com", port: 443),
             config: .defaults(transportSecurity: .tls(.defaults(configure: { config in
                 config.serverHostname = "cloudtrace.googleapis.com"
-            }))),
-            eventLoopGroup: eventLoopGroup
+            })))
         )
-        let grpcClient = GRPCClient(transport: transport)
-        self.grpcClient = grpcClient
-        self.grpcClientRunTask = Task.detached {
-            try await grpcClient.run()
-        }
-
+        self.grpcClient = GRPCClient(transport: transport)
         self.client = Google_Devtools_Cloudtrace_V2_TraceService_Client(wrapping: grpcClient)
-
-        scheduleRepeatingWriteTimer()
     }
 
-    public func shutdown() async throws {
-        writeTimer.withLock {
-            $0?.invalidate()
-            $0 = nil
+    public func run() async throws {
+        let writeTimerTask = startWriteTimerTask()
+
+        try await withGracefulShutdownHandler {
+            try await withThrowingDiscardingTaskGroup { group in
+                group.addTask(priority: .background) {
+                    try await self.grpcClient.run()
+                }
+                if let writeTimerTask {
+                    group.addTask(priority: .background) {
+                        do {
+                            try await writeTimerTask.value
+                        } catch {
+                            if !(error is CancellationError) {
+                                self.logger.error("Timer task failed: \(error)") // TODO: Remove this when typed throws in concurrency module has been implemented: https://forums.swift.org/t/pitch-typed-throws-in-the-concurrency-module/68210
+                            }
+                        }
+                    }
+                }
+            }
+        } onGracefulShutdown: {
+            // Cancel write timer
+            writeTimerTask?.cancel()
+
+            // Force a last flush
+            self.forceFlush()
+
+            // Wait for last write task before shutting down gRPC client
+            self.lastWriteTask.withLock {
+                let task = $0
+                Task(priority: .userInitiated) {
+                    await task?.value
+                    self.grpcClient.beginGracefulShutdown()
+                }
+            }
         }
 
-        writeIfNeeded()
-        await waitForWrite()
-        grpcClient.beginGracefulShutdown()
-        try await grpcClientRunTask.value
+        await lastWriteTask.withLock { $0 }?.value
+
         try await authorization.shutdown()
     }
 
     public func forceFlush() {
-        writeIfNeeded()
+        lastWriteTask.withLock {
+            $0 = Task(priority: .userInitiated) {
+                await writeIfNeeded()
+            }
+        }
     }
 
     public func startSpan<Instant: TracerInstant>(

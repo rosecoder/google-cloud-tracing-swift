@@ -1,24 +1,46 @@
 import Testing
+import Foundation
+import Logging
 import Tracing
 import GoogleCloudServiceContext
+import ServiceLifecycle
 @testable import GoogleCloudTracing
-import NIO
-import Foundation
-
-import Logging
 
 @Suite struct IntegrationTests {
 
     @Test(.enabled(if: ProcessInfo.processInfo.environment["GOOGLE_APPLICATION_CREDENTIALS"] != nil))
     func createSpan() async throws {
-        let tracer = try await GoogleCloudTracer(eventLoopGroup: MultiThreadedEventLoopGroup(numberOfThreads: 1))
-        InstrumentationSystem.bootstrap(tracer)
+        var logger = Logger(label: "test")
+        logger.logLevel = .trace
 
         var context = ServiceContext.current ?? .topLevel
         context.serviceName = "test-api"
         context.serviceVersion = "1.0.1"
 
         try await ServiceContext.withValue(context) {
+            let tracer = try GoogleCloudTracer()
+            InstrumentationSystem.bootstrap(tracer)
+
+            let app = AppService()
+
+            let serviceGroup = ServiceGroup(configuration: ServiceGroupConfiguration(
+                services: [
+                    .init(service: tracer),
+                    .init(service: app, successTerminationBehavior: .gracefullyShutdownGroup),
+                ],
+                logger: logger
+            ))
+
+            try await serviceGroup.run()
+
+            // Manually validate that spans has been created i GCP
+            // Traces should be written automatically during shutdown
+        }
+    }
+
+    struct AppService: Service {
+
+        func run() async throws {
             do {
                 try await withSpan("root-span") { span in
                     span.attributes["test-attribute"] = "test-value"
@@ -27,7 +49,7 @@ import Logging
                         for number in 1...3 {
                             group.addTask {
                                 try await withSpan("child-span-\(number)") { span in
-                                    try await Task.sleep(for: .milliseconds(50))
+                                    try await Task.sleep(for: .milliseconds(.random(in: 5..<50)))
                                     if number == 2 {
                                         throw SomeError()
                                     }
@@ -43,15 +65,6 @@ import Logging
                 }
             }
         }
-
-        tracer.forceFlush()
-
-        let lastWriteTask = tracer.lastWriteTask.withLock { $0 }
-        try await lastWriteTask?.value
-
-        try await tracer.shutdown()
-
-        // Manual validation
     }
 
     struct SomeError: Error {}

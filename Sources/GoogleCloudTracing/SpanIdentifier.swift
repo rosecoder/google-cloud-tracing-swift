@@ -1,5 +1,3 @@
-import Foundation
-
 public struct SpanIdentifier: Sendable, Equatable, Codable {
 
     public typealias RawValue = UInt64
