@@ -25,117 +25,299 @@ import GRPCCore
 import GRPCProtobuf
 import SwiftProtobuf
 
+// MARK: - google.devtools.cloudtrace.v2.TraceService
+
+/// Namespace containing generated types for the "google.devtools.cloudtrace.v2.TraceService" service.
 internal enum Google_Devtools_Cloudtrace_V2_TraceService {
-    internal static let descriptor = GRPCCore.ServiceDescriptor.google_devtools_cloudtrace_v2_TraceService
+    /// Service descriptor for the "google.devtools.cloudtrace.v2.TraceService" service.
+    internal static let descriptor = GRPCCore.ServiceDescriptor(fullyQualifiedService: "google.devtools.cloudtrace.v2.TraceService")
+    /// Namespace for method metadata.
     internal enum Method {
+        /// Namespace for "BatchWriteSpans" metadata.
         internal enum BatchWriteSpans {
+            /// Request type for "BatchWriteSpans".
             internal typealias Input = Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest
+            /// Response type for "BatchWriteSpans".
             internal typealias Output = SwiftProtobuf.Google_Protobuf_Empty
+            /// Descriptor for "BatchWriteSpans".
             internal static let descriptor = GRPCCore.MethodDescriptor(
-                service: Google_Devtools_Cloudtrace_V2_TraceService.descriptor.fullyQualifiedService,
+                service: GRPCCore.ServiceDescriptor(fullyQualifiedService: "google.devtools.cloudtrace.v2.TraceService"),
                 method: "BatchWriteSpans"
             )
         }
+        /// Namespace for "CreateSpan" metadata.
         internal enum CreateSpan {
+            /// Request type for "CreateSpan".
             internal typealias Input = Google_Devtools_Cloudtrace_V2_Span
+            /// Response type for "CreateSpan".
             internal typealias Output = Google_Devtools_Cloudtrace_V2_Span
+            /// Descriptor for "CreateSpan".
             internal static let descriptor = GRPCCore.MethodDescriptor(
-                service: Google_Devtools_Cloudtrace_V2_TraceService.descriptor.fullyQualifiedService,
+                service: GRPCCore.ServiceDescriptor(fullyQualifiedService: "google.devtools.cloudtrace.v2.TraceService"),
                 method: "CreateSpan"
             )
         }
+        /// Descriptors for all methods in the "google.devtools.cloudtrace.v2.TraceService" service.
         internal static let descriptors: [GRPCCore.MethodDescriptor] = [
             BatchWriteSpans.descriptor,
             CreateSpan.descriptor
         ]
     }
-    @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
-    internal typealias ClientProtocol = Google_Devtools_Cloudtrace_V2_TraceService_ClientProtocol
-    @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
-    internal typealias Client = Google_Devtools_Cloudtrace_V2_TraceService_Client
 }
 
 extension GRPCCore.ServiceDescriptor {
-    internal static let google_devtools_cloudtrace_v2_TraceService = Self(
-        package: "google.devtools.cloudtrace.v2",
-        service: "TraceService"
-    )
+    /// Service descriptor for the "google.devtools.cloudtrace.v2.TraceService" service.
+    internal static let google_devtools_cloudtrace_v2_TraceService = GRPCCore.ServiceDescriptor(fullyQualifiedService: "google.devtools.cloudtrace.v2.TraceService")
 }
 
-/// Service for collecting and viewing traces and spans within a trace.
-///
-/// A trace is a collection of spans corresponding to a single
-/// operation or a set of operations in an application.
-///
-/// A span is an individual timed event which forms a node of the trace tree.
-/// A single trace can contain spans from multiple services.
-@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
-internal protocol Google_Devtools_Cloudtrace_V2_TraceService_ClientProtocol: Sendable {
-    /// Batch writes new spans to new or existing traces. You cannot update
-    /// existing spans.
-    func batchWriteSpans<R>(
-        request: GRPCCore.ClientRequest<Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest>,
-        serializer: some GRPCCore.MessageSerializer<Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest>,
-        deserializer: some GRPCCore.MessageDeserializer<SwiftProtobuf.Google_Protobuf_Empty>,
-        options: GRPCCore.CallOptions,
-        _ body: @Sendable @escaping (GRPCCore.ClientResponse<SwiftProtobuf.Google_Protobuf_Empty>) async throws -> R
-    ) async throws -> R where R: Sendable
-    
-    /// Creates a new span.
-    func createSpan<R>(
-        request: GRPCCore.ClientRequest<Google_Devtools_Cloudtrace_V2_Span>,
-        serializer: some GRPCCore.MessageSerializer<Google_Devtools_Cloudtrace_V2_Span>,
-        deserializer: some GRPCCore.MessageDeserializer<Google_Devtools_Cloudtrace_V2_Span>,
-        options: GRPCCore.CallOptions,
-        _ body: @Sendable @escaping (GRPCCore.ClientResponse<Google_Devtools_Cloudtrace_V2_Span>) async throws -> R
-    ) async throws -> R where R: Sendable
+// MARK: google.devtools.cloudtrace.v2.TraceService (client)
+
+extension Google_Devtools_Cloudtrace_V2_TraceService {
+    /// Generated client protocol for the "google.devtools.cloudtrace.v2.TraceService" service.
+    ///
+    /// You don't need to implement this protocol directly, use the generated
+    /// implementation, ``Client``.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > Service for collecting and viewing traces and spans within a trace.
+    /// > 
+    /// > A trace is a collection of spans corresponding to a single
+    /// > operation or a set of operations in an application.
+    /// > 
+    /// > A span is an individual timed event which forms a node of the trace tree.
+    /// > A single trace can contain spans from multiple services.
+    internal protocol ClientProtocol: Sendable {
+        /// Call the "BatchWriteSpans" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > Batch writes new spans to new or existing traces. You cannot update
+        /// > existing spans.
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest` message.
+        ///   - serializer: A serializer for `Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest` messages.
+        ///   - deserializer: A deserializer for `SwiftProtobuf.Google_Protobuf_Empty` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        func batchWriteSpans<Result>(
+            request: GRPCCore.ClientRequest<Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest>,
+            serializer: some GRPCCore.MessageSerializer<Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<SwiftProtobuf.Google_Protobuf_Empty>,
+            options: GRPCCore.CallOptions,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<SwiftProtobuf.Google_Protobuf_Empty>) async throws -> Result
+        ) async throws -> Result where Result: Sendable
+
+        /// Call the "CreateSpan" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > Creates a new span.
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Google_Devtools_Cloudtrace_V2_Span` message.
+        ///   - serializer: A serializer for `Google_Devtools_Cloudtrace_V2_Span` messages.
+        ///   - deserializer: A deserializer for `Google_Devtools_Cloudtrace_V2_Span` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        func createSpan<Result>(
+            request: GRPCCore.ClientRequest<Google_Devtools_Cloudtrace_V2_Span>,
+            serializer: some GRPCCore.MessageSerializer<Google_Devtools_Cloudtrace_V2_Span>,
+            deserializer: some GRPCCore.MessageDeserializer<Google_Devtools_Cloudtrace_V2_Span>,
+            options: GRPCCore.CallOptions,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Google_Devtools_Cloudtrace_V2_Span>) async throws -> Result
+        ) async throws -> Result where Result: Sendable
+    }
+
+    /// Generated client for the "google.devtools.cloudtrace.v2.TraceService" service.
+    ///
+    /// The ``Client`` provides an implementation of ``ClientProtocol`` which wraps
+    /// a `GRPCCore.GRPCCClient`. The underlying `GRPCClient` provides the long-lived
+    /// means of communication with the remote peer.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > Service for collecting and viewing traces and spans within a trace.
+    /// > 
+    /// > A trace is a collection of spans corresponding to a single
+    /// > operation or a set of operations in an application.
+    /// > 
+    /// > A span is an individual timed event which forms a node of the trace tree.
+    /// > A single trace can contain spans from multiple services.
+    internal struct Client: ClientProtocol {
+        private let client: GRPCCore.GRPCClient
+
+        /// Creates a new client wrapping the provided `GRPCCore.GRPCClient`.
+        ///
+        /// - Parameters:
+        ///   - client: A `GRPCCore.GRPCClient` providing a communication channel to the service.
+        internal init(wrapping client: GRPCCore.GRPCClient) {
+            self.client = client
+        }
+
+        /// Call the "BatchWriteSpans" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > Batch writes new spans to new or existing traces. You cannot update
+        /// > existing spans.
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest` message.
+        ///   - serializer: A serializer for `Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest` messages.
+        ///   - deserializer: A deserializer for `SwiftProtobuf.Google_Protobuf_Empty` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        internal func batchWriteSpans<Result>(
+            request: GRPCCore.ClientRequest<Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest>,
+            serializer: some GRPCCore.MessageSerializer<Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<SwiftProtobuf.Google_Protobuf_Empty>,
+            options: GRPCCore.CallOptions = .defaults,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<SwiftProtobuf.Google_Protobuf_Empty>) async throws -> Result = { response in
+                try response.message
+            }
+        ) async throws -> Result where Result: Sendable {
+            try await self.client.unary(
+                request: request,
+                descriptor: Google_Devtools_Cloudtrace_V2_TraceService.Method.BatchWriteSpans.descriptor,
+                serializer: serializer,
+                deserializer: deserializer,
+                options: options,
+                onResponse: handleResponse
+            )
+        }
+
+        /// Call the "CreateSpan" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > Creates a new span.
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Google_Devtools_Cloudtrace_V2_Span` message.
+        ///   - serializer: A serializer for `Google_Devtools_Cloudtrace_V2_Span` messages.
+        ///   - deserializer: A deserializer for `Google_Devtools_Cloudtrace_V2_Span` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        internal func createSpan<Result>(
+            request: GRPCCore.ClientRequest<Google_Devtools_Cloudtrace_V2_Span>,
+            serializer: some GRPCCore.MessageSerializer<Google_Devtools_Cloudtrace_V2_Span>,
+            deserializer: some GRPCCore.MessageDeserializer<Google_Devtools_Cloudtrace_V2_Span>,
+            options: GRPCCore.CallOptions = .defaults,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Google_Devtools_Cloudtrace_V2_Span>) async throws -> Result = { response in
+                try response.message
+            }
+        ) async throws -> Result where Result: Sendable {
+            try await self.client.unary(
+                request: request,
+                descriptor: Google_Devtools_Cloudtrace_V2_TraceService.Method.CreateSpan.descriptor,
+                serializer: serializer,
+                deserializer: deserializer,
+                options: options,
+                onResponse: handleResponse
+            )
+        }
+    }
 }
 
-@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+// Helpers providing default arguments to 'ClientProtocol' methods.
 extension Google_Devtools_Cloudtrace_V2_TraceService.ClientProtocol {
-    internal func batchWriteSpans<R>(
+    /// Call the "BatchWriteSpans" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > Batch writes new spans to new or existing traces. You cannot update
+    /// > existing spans.
+    ///
+    /// - Parameters:
+    ///   - request: A request containing a single `Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest` message.
+    ///   - options: Options to apply to this RPC.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func batchWriteSpans<Result>(
         request: GRPCCore.ClientRequest<Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest>,
         options: GRPCCore.CallOptions = .defaults,
-        _ body: @Sendable @escaping (GRPCCore.ClientResponse<SwiftProtobuf.Google_Protobuf_Empty>) async throws -> R = {
-            try $0.message
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<SwiftProtobuf.Google_Protobuf_Empty>) async throws -> Result = { response in
+            try response.message
         }
-    ) async throws -> R where R: Sendable {
+    ) async throws -> Result where Result: Sendable {
         try await self.batchWriteSpans(
             request: request,
             serializer: GRPCProtobuf.ProtobufSerializer<Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest>(),
             deserializer: GRPCProtobuf.ProtobufDeserializer<SwiftProtobuf.Google_Protobuf_Empty>(),
             options: options,
-            body
+            onResponse: handleResponse
         )
     }
-    
-    internal func createSpan<R>(
+
+    /// Call the "CreateSpan" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > Creates a new span.
+    ///
+    /// - Parameters:
+    ///   - request: A request containing a single `Google_Devtools_Cloudtrace_V2_Span` message.
+    ///   - options: Options to apply to this RPC.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func createSpan<Result>(
         request: GRPCCore.ClientRequest<Google_Devtools_Cloudtrace_V2_Span>,
         options: GRPCCore.CallOptions = .defaults,
-        _ body: @Sendable @escaping (GRPCCore.ClientResponse<Google_Devtools_Cloudtrace_V2_Span>) async throws -> R = {
-            try $0.message
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Google_Devtools_Cloudtrace_V2_Span>) async throws -> Result = { response in
+            try response.message
         }
-    ) async throws -> R where R: Sendable {
+    ) async throws -> Result where Result: Sendable {
         try await self.createSpan(
             request: request,
             serializer: GRPCProtobuf.ProtobufSerializer<Google_Devtools_Cloudtrace_V2_Span>(),
             deserializer: GRPCProtobuf.ProtobufDeserializer<Google_Devtools_Cloudtrace_V2_Span>(),
             options: options,
-            body
+            onResponse: handleResponse
         )
     }
 }
 
-@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+// Helpers providing sugared APIs for 'ClientProtocol' methods.
 extension Google_Devtools_Cloudtrace_V2_TraceService.ClientProtocol {
-    /// Batch writes new spans to new or existing traces. You cannot update
-    /// existing spans.
+    /// Call the "BatchWriteSpans" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > Batch writes new spans to new or existing traces. You cannot update
+    /// > existing spans.
+    ///
+    /// - Parameters:
+    ///   - message: request message to send.
+    ///   - metadata: Additional metadata to send, defaults to empty.
+    ///   - options: Options to apply to this RPC, defaults to `.defaults`.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
     internal func batchWriteSpans<Result>(
         _ message: Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest,
         metadata: GRPCCore.Metadata = [:],
         options: GRPCCore.CallOptions = .defaults,
-        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<SwiftProtobuf.Google_Protobuf_Empty>) async throws -> Result = {
-            try $0.message
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<SwiftProtobuf.Google_Protobuf_Empty>) async throws -> Result = { response in
+            try response.message
         }
     ) async throws -> Result where Result: Sendable {
         let request = GRPCCore.ClientRequest<Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest>(
@@ -145,17 +327,30 @@ extension Google_Devtools_Cloudtrace_V2_TraceService.ClientProtocol {
         return try await self.batchWriteSpans(
             request: request,
             options: options,
-            handleResponse
+            onResponse: handleResponse
         )
     }
-    
-    /// Creates a new span.
+
+    /// Call the "CreateSpan" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > Creates a new span.
+    ///
+    /// - Parameters:
+    ///   - message: request message to send.
+    ///   - metadata: Additional metadata to send, defaults to empty.
+    ///   - options: Options to apply to this RPC, defaults to `.defaults`.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
     internal func createSpan<Result>(
         _ message: Google_Devtools_Cloudtrace_V2_Span,
         metadata: GRPCCore.Metadata = [:],
         options: GRPCCore.CallOptions = .defaults,
-        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Google_Devtools_Cloudtrace_V2_Span>) async throws -> Result = {
-            try $0.message
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Google_Devtools_Cloudtrace_V2_Span>) async throws -> Result = { response in
+            try response.message
         }
     ) async throws -> Result where Result: Sendable {
         let request = GRPCCore.ClientRequest<Google_Devtools_Cloudtrace_V2_Span>(
@@ -165,64 +360,7 @@ extension Google_Devtools_Cloudtrace_V2_TraceService.ClientProtocol {
         return try await self.createSpan(
             request: request,
             options: options,
-            handleResponse
-        )
-    }
-}
-
-/// Service for collecting and viewing traces and spans within a trace.
-///
-/// A trace is a collection of spans corresponding to a single
-/// operation or a set of operations in an application.
-///
-/// A span is an individual timed event which forms a node of the trace tree.
-/// A single trace can contain spans from multiple services.
-@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
-internal struct Google_Devtools_Cloudtrace_V2_TraceService_Client: Google_Devtools_Cloudtrace_V2_TraceService.ClientProtocol {
-    private let client: GRPCCore.GRPCClient
-    
-    internal init(wrapping client: GRPCCore.GRPCClient) {
-        self.client = client
-    }
-    
-    /// Batch writes new spans to new or existing traces. You cannot update
-    /// existing spans.
-    internal func batchWriteSpans<R>(
-        request: GRPCCore.ClientRequest<Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest>,
-        serializer: some GRPCCore.MessageSerializer<Google_Devtools_Cloudtrace_V2_BatchWriteSpansRequest>,
-        deserializer: some GRPCCore.MessageDeserializer<SwiftProtobuf.Google_Protobuf_Empty>,
-        options: GRPCCore.CallOptions = .defaults,
-        _ body: @Sendable @escaping (GRPCCore.ClientResponse<SwiftProtobuf.Google_Protobuf_Empty>) async throws -> R = {
-            try $0.message
-        }
-    ) async throws -> R where R: Sendable {
-        try await self.client.unary(
-            request: request,
-            descriptor: Google_Devtools_Cloudtrace_V2_TraceService.Method.BatchWriteSpans.descriptor,
-            serializer: serializer,
-            deserializer: deserializer,
-            options: options,
-            handler: body
-        )
-    }
-    
-    /// Creates a new span.
-    internal func createSpan<R>(
-        request: GRPCCore.ClientRequest<Google_Devtools_Cloudtrace_V2_Span>,
-        serializer: some GRPCCore.MessageSerializer<Google_Devtools_Cloudtrace_V2_Span>,
-        deserializer: some GRPCCore.MessageDeserializer<Google_Devtools_Cloudtrace_V2_Span>,
-        options: GRPCCore.CallOptions = .defaults,
-        _ body: @Sendable @escaping (GRPCCore.ClientResponse<Google_Devtools_Cloudtrace_V2_Span>) async throws -> R = {
-            try $0.message
-        }
-    ) async throws -> R where R: Sendable {
-        try await self.client.unary(
-            request: request,
-            descriptor: Google_Devtools_Cloudtrace_V2_TraceService.Method.CreateSpan.descriptor,
-            serializer: serializer,
-            deserializer: deserializer,
-            options: options,
-            handler: body
+            onResponse: handleResponse
         )
     }
 }

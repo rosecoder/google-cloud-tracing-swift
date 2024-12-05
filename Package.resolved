@@ -1,5 +1,5 @@
 {
-  "originHash" : "c7b693a9a23bf18474ba18f1f8a3d2b30fe010fc60606eb68e76d201171144ac",
+  "originHash" : "ebcb23c747c2b3851bd98803be02b7ad71289b2502ed0acc807a112ab0e35bef",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -24,6 +24,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/rosecoder/google-cloud-service-context.git",
       "state" : {
+        "branch" : "main",
         "revision" : "5464a8beb9b4d4d93cc219313b207bd82cc128bb"
       }
     },
@@ -32,17 +33,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/grpc/grpc-swift.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "dd22b3938eecdf1008dddd9d95e7a95272459dc8"
+        "revision" : "e390c85ad880004513221555884ae77b08714f1e",
+        "version" : "2.0.0-beta.1"
       }
     },
     {
       "identity" : "grpc-swift-nio-transport",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/rosecoder/grpc-swift-nio-transport.git",
+      "location" : "https://github.com/grpc/grpc-swift-nio-transport.git",
       "state" : {
-        "branch" : "authority-header",
-        "revision" : "6ec83cdde18b721def0dd5c6090690f40b5aea7a"
+        "revision" : "ae3f3f5cd03bd43dcc5cb8bcb65831618bc73330",
+        "version" : "1.0.0-beta.1"
       }
     },
     {
@@ -50,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/grpc/grpc-swift-protobuf.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "eaebe06fa8d2707e2aed0b0837333877d10077b5"
+        "revision" : "a2834ea6305d7e44ba762d593e7ea1078b457095",
+        "version" : "1.0.0-beta.1"
       }
     },
     {

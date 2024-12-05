@@ -16,7 +16,7 @@ public final class GoogleCloudTracer: Tracer, Service {
     let logger = Logger(label: "trace.write")
 
     let authorization: Authorization
-    let client: Google_Devtools_Cloudtrace_V2_TraceService_Client
+    let client: Google_Devtools_Cloudtrace_V2_TraceService.ClientProtocol
 
     private let grpcClient: GRPCClient
 
@@ -38,14 +38,11 @@ public final class GoogleCloudTracer: Tracer, Service {
             "https://www.googleapis.com/auth/cloud-platform",
         ], eventLoopGroup: .singletonMultiThreadedEventLoopGroup)
 
-        let transport = try HTTP2ClientTransport.Posix(
-            target: .dns(host: "cloudtrace.googleapis.com", port: 443),
-            config: .defaults(transportSecurity: .tls(.defaults(configure: { config in
-                config.serverHostname = "cloudtrace.googleapis.com"
-            })))
-        )
-        self.grpcClient = GRPCClient(transport: transport)
-        self.client = Google_Devtools_Cloudtrace_V2_TraceService_Client(wrapping: grpcClient)
+        self.grpcClient = GRPCClient(transport: try .http2NIOPosix(
+            target: .dns(host: "cloudtrace.googleapis.com"),
+            transportSecurity: .tls
+        ))
+        self.client = Google_Devtools_Cloudtrace_V2_TraceService.Client(wrapping: grpcClient)
     }
 
     public func run() async throws {

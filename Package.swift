@@ -13,11 +13,11 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-log.git", from: "1.4.2"),
         .package(url: "https://github.com/apple/swift-distributed-tracing.git", from: "1.1.0"),
         .package(url: "https://github.com/swift-server/swift-service-lifecycle.git", from: "2.0.0"),
-        .package(url: "https://github.com/grpc/grpc-swift-protobuf.git", branch: "main"),
-        .package(url: "https://github.com/rosecoder/grpc-swift-nio-transport.git", branch: "authority-header"),
+        .package(url: "https://github.com/grpc/grpc-swift-protobuf.git", from: "1.0.0-beta.1"),
+        .package(url: "https://github.com/grpc/grpc-swift-nio-transport.git", from: "1.0.0-beta.1"),
         .package(url: "https://github.com/rosecoder/google-cloud-auth-swift.git", from: "1.0.0"),
         .package(url: "https://github.com/rosecoder/retryable-task.git", from: "1.1.2"),
-        .package(url: "https://github.com/rosecoder/google-cloud-service-context.git", revision: "5464a8beb9b4d4d93cc219313b207bd82cc128bb"),
+        .package(url: "https://github.com/rosecoder/google-cloud-service-context.git", branch: "main"),
     ],
     targets: [
         .target(
