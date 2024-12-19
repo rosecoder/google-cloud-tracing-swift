@@ -8,7 +8,7 @@ This package provides a Swift implementation for tracing with the Google Cloud P
 import Tracing
 import GoogleCloudTracing
 
-let tracer = GoogleCloudTracer(eventLoopGroup: <#eventLoopGroup#>)
+let tracer = GoogleCloudTracer()
 InstrumentationSystem.bootstrap(tracer)
 ```
 
