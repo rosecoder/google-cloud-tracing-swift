@@ -14,7 +14,7 @@ import NIO
 
     @Test func extractValidTraceContext() {
         var context = ServiceContext.topLevel
-        let carrier = ["X-Cloud-Trace-Context": "105445aa7843bc8bf206b12000100000/1;o=1"]
+        let carrier = ["traceparent": "00-105445aa7843bc8bf206b12000100000-0000000000000001-01"]
         
         tracer.extract(carrier, into: &context, using: DictionaryExtractor())
         
@@ -26,7 +26,7 @@ import NIO
     
     @Test func extractInvalidTraceContext() {
         var context = ServiceContext.topLevel
-        let carrier = ["X-Cloud-Trace-Context": "invalid-trace-context"]
+        let carrier = ["traceparent": "invalid-trace-context"]
         
         tracer.extract(carrier, into: &context, using: DictionaryExtractor())
         
@@ -40,12 +40,12 @@ import NIO
         
         tracer.inject(context, into: &carrier, using: DictionaryInjector())
         
-        #expect(carrier["X-Cloud-Trace-Context"] == "105445aa7843bc8bf206b12000100000/0000000000000001;o=1")
+        #expect(carrier["traceparent"] == "00-105445aa7843bc8bf206b12000100000-0000000000000001-01")
     }
     
     @Test func extractTraceContextWithoutSampling() {
         var context = ServiceContext.topLevel
-        let carrier = ["X-Cloud-Trace-Context": "105445aa7843bc8bf206b12000100000/1"]
+        let carrier = ["traceparent": "00-105445aa7843bc8bf206b12000100000-0000000000000001-00"]
         
         tracer.extract(carrier, into: &context, using: DictionaryExtractor())
         

@@ -11,15 +11,18 @@ extension GoogleCloudTracer {
         guard let trace = context.trace, let spanID = trace.spanIDs.last else {
             return
         }
-        let value = encodeXCloudTraceContext(trace: trace, spanID: spanID)
-        injector.inject(value, forKey: "X-Cloud-Trace-Context", into: &carrier)
+        let value = encodeTraceParent(trace: trace, spanID: spanID)
+        injector.inject(value, forKey: "traceparent", into: &carrier)
     }
 
-    private func encodeXCloudTraceContext(trace: Trace, spanID: UInt64) -> String {
-        trace.id.prefixedHexRepresentation +
-        "/" +
-        spanID.prefixedHexRepresentation +
-        ";o=" +
-        (trace.isSampled ? "1" : "0")
+    private func encodeTraceParent(trace: Trace, spanID: UInt64) -> String {
+        // Version is always 00
+        let version = "00"
+        let traceIDHex = trace.id.prefixedHexRepresentation
+        let parentIDHex = spanID.prefixedHexRepresentation
+        // Flags: for now we only use the sampling bit
+        let flags = trace.isSampled ? "01" : "00"
+        
+        return "\(version)-\(traceIDHex)-\(parentIDHex)-\(flags)"
     }
 }
