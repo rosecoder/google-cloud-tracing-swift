@@ -17,7 +17,7 @@ let package = Package(
         .package(url: "https://github.com/grpc/grpc-swift-nio-transport.git", from: "1.0.0-beta.2"),
         .package(url: "https://github.com/rosecoder/google-cloud-auth-swift.git", from: "1.0.0"),
         .package(url: "https://github.com/rosecoder/retryable-task.git", from: "1.1.2"),
-        .package(url: "https://github.com/rosecoder/google-cloud-service-context.git", from: "0.0.1"),
+        .package(url: "https://github.com/rosecoder/google-cloud-service-context.git", from: "0.0.2"),
     ],
     targets: [
         .target(

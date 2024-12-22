@@ -1,4 +1,3 @@
-import ServiceContextModule
 import Instrumentation
 import GoogleCloudServiceContext
 

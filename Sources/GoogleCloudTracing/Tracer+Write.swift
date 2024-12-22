@@ -1,4 +1,3 @@
-import ServiceContextModule
 import Instrumentation
 import GoogleCloudServiceContext
 import RetryableTask
@@ -56,7 +55,7 @@ extension GoogleCloudTracer {
 
     private func _write(spans: [Span]) async throws {
         let context = ServiceContext.current ?? .topLevel
-        guard let projectID = context.projectID else {
+        guard let projectID = await context.projectID else {
             throw WriteError.missingProjectID
         }
         let encodedSpans = spans.compactMap {
