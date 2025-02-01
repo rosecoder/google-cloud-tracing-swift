@@ -151,14 +151,14 @@ extension Google_Devtools_Cloudtrace_V2_TraceService {
     /// > 
     /// > A span is an individual timed event which forms a node of the trace tree.
     /// > A single trace can contain spans from multiple services.
-    internal struct Client: ClientProtocol {
-        private let client: GRPCCore.GRPCClient
+    internal struct Client<Transport>: ClientProtocol where Transport: GRPCCore.ClientTransport {
+        private let client: GRPCCore.GRPCClient<Transport>
 
         /// Creates a new client wrapping the provided `GRPCCore.GRPCClient`.
         ///
         /// - Parameters:
         ///   - client: A `GRPCCore.GRPCClient` providing a communication channel to the service.
-        internal init(wrapping client: GRPCCore.GRPCClient) {
+        internal init(wrapping client: GRPCCore.GRPCClient<Transport>) {
             self.client = client
         }
 
